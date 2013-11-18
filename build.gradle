@@ -14,10 +14,10 @@ ext.outjar = "./dist/lit-groovy-${groovyVer}.jar"
 
 dependencies{
     ajc     "org.aspectj:aspectjtools:${ajVersion}"
-    compile "org.aspectj:aspectjrt:${ajVersion}"
 
+    compile "org.aspectj:aspectjrt:${ajVersion}"
     compile "org.codehaus.groovy:groovy:${groovyVer}"
+    compile  fileTree(dir: "injar/", include: "groovy-${groovyVer}.jar")
 
     ajInpath files("injar/groovy-${groovyVer}.jar")
-    compile  fileTree(dir: "injar/", include: "groovy-${groovyVer}.jar")
 }
