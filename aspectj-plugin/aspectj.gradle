@@ -1,0 +1,28 @@
+apply plugin: 'java'
+
+configurations {
+    ajc
+    aspects
+    ajInpath
+}
+
+configurations.ajInpath.transitive = false
+
+task compileJava(dependsOn: JavaPlugin.PROCESS_RESOURCES_TASK_NAME, overwrite: true) << {
+    ant.mkdir(dir:"./dist")
+    ant.taskdef( resource:"org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties", classpath: configurations.ajc.asPath)
+    ant.iajc(source: project.ext.sourceCompatibility,
+             target: project.ext.targetCompatibility,
+             maxmem:"512m", fork:"true",
+             aspectPath: sourceSets.main.output.classesDir.absolutePath,
+             classpath:  configurations.compile.asPath,
+             inpath:     configurations.ajInpath.asPath,
+             outjar:     project.ext.outjar,
+             Xlint:      "warning"){
+        sourceroots {
+            sourceSets.main.java.srcDirs.each {
+                pathelement(location:it.absolutePath)
+            }
+        }
+    }
+}

@@ -1,0 +1,23 @@
+apply from: './aspectj-plugin/aspectj.gradle'
+
+repositories {
+    mavenCentral()
+}
+
+def ajVersion  = "1.6.12"
+def groovyVer = "2.1.9"
+
+ext.sourceCompatibility  = "1.5"
+ext.targetCompatibility  = "1.5"
+
+ext.outjar = "./dist/lit-groovy-${groovyVer}.jar"
+
+dependencies{
+    ajc     "org.aspectj:aspectjtools:${ajVersion}"
+    compile "org.aspectj:aspectjrt:${ajVersion}"
+
+    compile "org.codehaus.groovy:groovy:${groovyVer}"
+
+    ajInpath files("injar/groovy-${groovyVer}.jar")
+    compile  fileTree(dir: "injar/", include: "groovy-${groovyVer}.jar")
+}
