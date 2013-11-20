@@ -9,16 +9,19 @@ configurations {
 configurations.ajInpath.transitive = false
 
 task compileJava(dependsOn: JavaPlugin.PROCESS_RESOURCES_TASK_NAME, overwrite: true) << {
+    logging.setLevel(LogLevel.INFO)
     ant.mkdir(dir:"./dist")
     ant.taskdef( resource:"org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties", classpath: configurations.ajc.asPath)
-    ant.iajc(source: project.ext.sourceCompatibility,
-             target: project.ext.targetCompatibility,
-             maxmem:"512m", fork:"true",
+    ant.iajc(source:     project.ext.source,
+             target:     project.ext.target,
+             maxmem:     "1024m",
+             fork:       "true",
              aspectPath: sourceSets.main.output.classesDir.absolutePath,
              classpath:  configurations.compile.asPath,
              inpath:     configurations.ajInpath.asPath,
              outjar:     project.ext.outjar,
-             Xlint:      "warning"){
+             XlintFile:  "./xlint.properties",
+             showWeaveInfo: "true"){
         sourceroots {
             sourceSets.main.java.srcDirs.each {
                 pathelement(location:it.absolutePath)
