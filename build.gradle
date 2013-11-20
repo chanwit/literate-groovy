@@ -4,11 +4,11 @@ repositories {
     mavenCentral()
 }
 
-def ajVersion  = "1.6.12"
+def ajVersion = "1.6.12"
 def groovyVer = "2.1.9"
 
-ext.sourceCompatibility  = "1.5"
-ext.targetCompatibility  = "1.5"
+ext.source  = "1.5"
+ext.target  = "1.5"
 
 ext.outjar = "./dist/lit-groovy-${groovyVer}.jar"
 
@@ -17,7 +17,6 @@ dependencies{
 
     compile "org.aspectj:aspectjrt:${ajVersion}"
     compile "org.codehaus.groovy:groovy:${groovyVer}"
-    compile  fileTree(dir: "injar/", include: "groovy-${groovyVer}.jar")
 
     ajInpath files("injar/groovy-${groovyVer}.jar")
 }
