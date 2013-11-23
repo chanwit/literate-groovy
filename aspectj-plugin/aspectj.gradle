@@ -16,6 +16,7 @@ task compileJava(dependsOn: JavaPlugin.PROCESS_RESOURCES_TASK_NAME, overwrite: t
              target:     project.ext.target,
              maxmem:     "1024m",
              fork:       "true",
+             encoding:   "UTF-8",
              aspectPath: sourceSets.main.output.classesDir.absolutePath,
              classpath:  configurations.compile.asPath,
              inpath:     configurations.ajInpath.asPath,
