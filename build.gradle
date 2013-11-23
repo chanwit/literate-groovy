@@ -1,22 +1,58 @@
+import static org.apache.tools.ant.taskdefs.condition.Os.*
+
 apply from: './aspectj-plugin/aspectj.gradle'
 
 repositories {
     mavenCentral()
+    mavenRepo url:"http://maven2.javacv.googlecode.com/git/"
 }
 
-def ajVersion = "1.6.12"
-def groovyVer = "2.1.9"
+def all = true
+// def aspectjVer = "1.6.12"
+def aspectjVer = "1.7.4"
+def groovyVer  = "2.1.9"
 
 ext.source  = "1.5"
 ext.target  = "1.5"
 
 ext.outjar = "./dist/lit-groovy-${groovyVer}.jar"
+if(all) {
+    ext.outjar = "./dist/lit-groovy-all-${groovyVer}.jar"
+}
 
 dependencies{
-    ajc     "org.aspectj:aspectjtools:${ajVersion}"
+    ajc     "org.aspectj:aspectjtools:${aspectjVer}"
 
-    compile "org.aspectj:aspectjrt:${ajVersion}"
-    compile "org.codehaus.groovy:groovy:${groovyVer}"
+    compile "org.aspectj:aspectjrt:${aspectjVer}"
+    compile "org.codehaus.groovy:groovy-all:${groovyVer}"
+    compile "org.pegdown:pegdown:1.2.1"
 
-    ajInpath files("injar/groovy-${groovyVer}.jar")
+    runtime "org.aspectj:aspectjrt:${aspectjVer}"
+    runtime "org.pegdown:pegdown:1.2.1"
+    runtime "org.spockframework:spock-core:0.7-groovy-2.0"
+    runtime "junit:junit-dep:4.10"
+    runtime "org.sikuli:sikuli-api:1.0.2"
+    runtime "com.googlecode.javacv:javacv:0.3"
+
+    if(all) {
+        ajInpath files("injar/groovy-all-${groovyVer}.jar")
+    } else {
+        ajInpath files("injar/groovy-${groovyVer}.jar")
+    }
 }
+
+task copyDeps(type: Copy, dependsOn: 'compileJava') {
+    from(configurations.runtime) {
+
+        if(!isFamily(FAMILY_WINDOWS)) exclude "javacv-0.3-windows-*.jar"
+        if(!isFamily(FAMILY_UNIX))    exclude "javacv-0.3-linux-*.jar"
+        if(!isFamily(FAMILY_MAC))     exclude "javacv-0.3-macosx-*.jar"
+
+        exclude "groovy-all-${groovyVer}.jar"
+    }
+    into "./dist"
+}
+
+//
+// TODO: copy sikuli-script to ./dist too
+//
