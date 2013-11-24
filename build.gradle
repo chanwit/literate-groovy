@@ -1,5 +1,9 @@
 import static org.apache.tools.ant.taskdefs.condition.Os.*
 
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'java'
+
 apply from: './aspectj-plugin/aspectj.gradle'
 
 repositories {
@@ -7,10 +11,15 @@ repositories {
     mavenRepo url:"http://maven2.javacv.googlecode.com/git/"
 }
 
-def all = true
-// def aspectjVer = "1.6.12"
-def aspectjVer = "1.7.4"
+def artifactId = 'literate-groovy'
 def groovyVer  = "2.1.9"
+def litBuild = "0"
+def all = true
+
+group   = "sut"
+version = "${groovyVer}.${litBuild}"
+
+def aspectjVer = "1.7.4" // "1.6.12"
 
 ext.source  = "1.5"
 ext.target  = "1.5"
@@ -18,6 +27,10 @@ ext.target  = "1.5"
 ext.outjar = "./dist/lit-groovy-${groovyVer}.jar"
 if(all) {
     ext.outjar = "./dist/lit-groovy-all-${groovyVer}.jar"
+}
+
+configurations {
+    deployables
 }
 
 dependencies{
@@ -30,7 +43,7 @@ dependencies{
     runtime "org.aspectj:aspectjrt:${aspectjVer}"
     runtime "org.pegdown:pegdown:1.2.1"
     runtime "org.spockframework:spock-core:0.7-groovy-2.0"
-    runtime "junit:junit-dep:4.10"
+    runtime "junit:junit-dep:4.11"
     runtime "org.sikuli:sikuli-api:1.0.2"
     runtime "com.googlecode.javacv:javacv:0.3"
 
@@ -38,6 +51,29 @@ dependencies{
         ajInpath files("injar/groovy-all-${groovyVer}.jar")
     } else {
         ajInpath files("injar/groovy-${groovyVer}.jar")
+    }
+}
+
+artifacts {
+    deployables new File("${projectDir}/dist/lit-groovy-all-${groovyVer}.jar")
+}
+
+uploadDeployables {
+    repositories {
+        mavenDeployer {
+            pom.whenConfigured { p ->
+                def g = p.dependencies.find { dep -> dep.groupId == 'org.codehaus.groovy' && dep.artifactId == 'groovy-all' }
+                if (g) { p.dependencies.remove(g) }
+            }
+            configuration = configurations.runtime
+            pom.artifactId = artifactId
+            repository (url: "https://api.bintray.com/maven/${userName}/maven/${artifactId}") {
+                authentication(
+                    userName: userName,
+                    password: apiKey
+                )
+            }
+        }
     }
 }
 
@@ -54,5 +90,7 @@ task copyDeps(type: Copy, dependsOn: 'compileJava') {
 }
 
 //
-// TODO: copy sikuli-script to ./dist too
+// TODO: build sikuli-script
+// TODO: build sater
+// to ./dist too
 //
